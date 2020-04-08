@@ -1,0 +1,34 @@
+{
+  "name": "cordova-plugin-switch-app-icon",
+  "version": "0.0.1",
+  "description": "Allows the change/switch of the app icon of a cordova app.",
+  "cordova": {
+    "id": "cordova-plugin-switch-app-icon",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JH7/cordova-plugin-switch-app-icon.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova-android",
+    "icon",
+    "change",
+    "switch"
+  ],
+  "author": "Jonas Hillebrand",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JH7/cordova-plugin-switch-app-icon/issues"
+  },
+  "homepage": "https://github.com/JH7/cordova-plugin-switch-app-icon#readme",
+  "dependencies": {
+    "plist": "^3.0.1",
+    "xml2js": "^0.4.23"
+  }
+}

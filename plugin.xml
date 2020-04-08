@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<plugin id="cordova-plugin-switch-app-icon" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+  <name>SwitchAppIcon</name>
+  <js-module name="SwitchAppIcon" src="www/SwitchAppIcon.js">
+    <merges target="SwitchAppIcon" />
+  </js-module>
+  <platform name="ios">
+    <hook type="after_prepare" src="scripts/iosAfterPrepare.js" />
+    <config-file parent="/*" target="config.xml">
+      <feature name="SwitchAppIcon">
+        <param name="ios-package" value="SwitchAppIcon" />
+      </feature>
+    </config-file>
+    <source-file src="src/ios/SwitchAppIcon.m" />
+    <source-file src="src/ios/SwitchAppIcon.h" />
+  </platform>
+  <platform name="android">
+    <hook type="after_prepare" src="scripts/androidAfterPrepare.js" />
+    <config-file parent="/*" target="res/xml/config.xml">
+      <feature name="SwitchAppIcon">
+        <param name="android-package" value="de.jh7.switchappicon.SwitchAppIcon" />
+      </feature>
+    </config-file>
+    <source-file src="src/android/SwitchAppIcon.java" target-dir="src/de/jh7/switchappicon/" />
+  </platform>
+</plugin>
