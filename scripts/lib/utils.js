@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const xml2js = require('xml2js');
 
 /**
@@ -13,23 +14,37 @@ module.exports = {
   async getVariables(packagePath, configXMLPath) {
     let variables = {};
 
-    let configXML = fs.readFileSync(configXMLPath, 'utf8')
-    configXML = await xml2js.parseStringPromise(configXML);
+    if (fs.existsSync(configXMLPath)) {
+      let configXML = fs.readFileSync(configXMLPath, 'utf8')
+      configXML = await xml2js.parseStringPromise(configXML);
 
-    if (configXML.widget.plugin) {
-      configXML.widget.plugin.forEach((plugin) => {
-        if (plugin.variable) {
-          plugin.variable.forEach((variable) => {
-            variables[variable.$.name] = variables[variable.$.value];
-          });
-        }
-      });
+      if (configXML.widget.plugin) {
+        configXML.widget.plugin.forEach((plugin) => {
+          if (plugin.variable) {
+            plugin.variable.forEach((variable) => {
+              variables[variable.$.name] = variables[variable.$.value];
+            });
+          }
+        });
+      }
     }
 
-    const package = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-    const packageVariables = package.cordova.plugins['cordova-plugin-switch-app-icon'] || {};
+    if (fs.existsSync(packagePath)) {
+      const package = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+      const packageVariables = package.cordova.plugins['cordova-plugin-switch-app-icon'] || {};
 
-    Object.assign(variables, packageVariables);
+      Object.assign(variables, packageVariables);
+    }
+
+    const meteorFetchPath = path.join(packagePath, 'plugins', 'fetch.json');
+    if (fs.existsSync(meteorFetchPath)) {
+      const meteorFetch = JSON.parse(fs.readFileSync(meteorFetchPath, 'utf8'));
+      const meteorFetchVariables = meteorFetch["cordova-plugin-switch-app-icon"]
+        ? meteorFetch["cordova-plugin-switch-app-icon"].variables : {};
+
+      Object.assign(variables, meteorFetchVariables);
+    }
+
     return variables;
   },
   getAliasesFromVariables(variables) {
