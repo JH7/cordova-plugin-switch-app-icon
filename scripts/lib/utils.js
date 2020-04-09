@@ -36,7 +36,7 @@ module.exports = {
       Object.assign(variables, packageVariables);
     }
 
-    const meteorFetchPath = path.join(packagePath, 'plugins', 'fetch.json');
+    const meteorFetchPath = path.join(packagePath, '..', 'plugins', 'fetch.json');
     if (fs.existsSync(meteorFetchPath)) {
       const meteorFetch = JSON.parse(fs.readFileSync(meteorFetchPath, 'utf8'));
       const meteorFetchVariables = meteorFetch["cordova-plugin-switch-app-icon"]
