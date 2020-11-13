@@ -15,7 +15,7 @@ module.exports = async function(context) {
 
   iosInfo = plist.parse(iosInfo);
 
-  if (!iosInfo.CFBundleIcons) iosInfo.CFBundleIcons = { CFBundleAlternateIcons: {} };
+  const CFBundleAlternateIcons = {};
 
   const aliases = Utils.getAliasesFromVariables(await Utils.getVariables(
     path.join(context.opts.projectRoot, 'package.json'),
@@ -23,8 +23,8 @@ module.exports = async function(context) {
   ));
 
   aliases.forEach((alias) => {
-    if (!iosInfo.CFBundleIcons.CFBundleAlternateIcons[`icon-${alias.name}`]) {
-      iosInfo.CFBundleIcons.CFBundleAlternateIcons[`icon-${alias.name}`] = {
+    if (!CFBundleAlternateIcons[`icon-${alias.name}`]) {
+      CFBundleAlternateIcons[`icon-${alias.name}`] = {
         UIPrerenderedIcon: true,
         CFBundleIconFiles: [
           `icon-${alias.name}`,
@@ -32,6 +32,9 @@ module.exports = async function(context) {
       }
     }
   });
+
+  if (!iosInfo.CFBundleIcons) iosInfo.CFBundleIcons = { CFBundleAlternateIcons };
+  if (!iosInfo['CFBundleIcons~ipad']) iosInfo['CFBundleIcons~ipad'] = { CFBundleAlternateIcons };
 
   const xml = plist.build(iosInfo);
 
