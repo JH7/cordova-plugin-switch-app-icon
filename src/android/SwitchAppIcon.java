@@ -77,11 +77,25 @@ public class SwitchAppIcon extends CordovaPlugin {
                 action = PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
             }
             packageManager.setComponentEnabledSetting(
-                new ComponentName(packageName, packageName + "." + appIcon),
+                new ComponentName(packageName, packageName + "." + value.toString()),
                 action,
                 PackageManager.DONT_KILL_APP
             );
         }
+
+        /* This is a bit hardcore, huh?
+        * Needs <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+        ActivityManager am = (ActivityManager)cordova.getActivity().getSystemService(Activity.ACTIVITY_SERVICE);
+        Intent i = new Intent(Intent.ACTION_MAIN);
+        i.addCategory(Intent.CATEGORY_HOME);
+        i.addCategory(Intent.CATEGORY_DEFAULT);
+        List<ResolveInfo> resolves = packageManager.queryIntentActivities(i, 0);
+        for (ResolveInfo res : resolves) {
+            if (res.activityInfo != null) {
+                am.killBackgroundProcesses(res.activityInfo.packageName);
+            }
+        }
+        */
 
         callbackContext.success("OK");
     }
