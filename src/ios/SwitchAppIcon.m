@@ -68,8 +68,15 @@ THE SOFTWARE.
     return;
   }
 
-  NSString *iconName = [command.arguments objectAtIndex:0];
-  BOOL suppressUserNotification = ([command.arguments count] == 1 || [command.arguments objectAtIndex:1] == nil || [[command.arguments objectAtIndex:1] boolValue]);
+    BOOL suppressUserNotification = false;
+    NSString *iconName = [command.arguments objectAtIndex:0];;
+    /* if ([[command.arguments objectAtIndex:0] isKindOfClass:[NSString class]]) {
+        NSDictionary *argDict =
+        iconName = argDict[@"iconName"];
+        suppressUserNotification = [argDict[@"supressUserNotification"] boolValue];
+    } else {
+        iconName = [command.arguments objectAtIndex:0];
+    } */
 
   if (iconName == nil) {
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"The 'iconName' parameter is mandatory"] callbackId:command.callbackId];
