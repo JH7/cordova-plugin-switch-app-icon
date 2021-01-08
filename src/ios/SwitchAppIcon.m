@@ -63,45 +63,64 @@ THE SOFTWARE.
 
 - (void) changeAppIcon:(CDVInvokedUrlCommand*)command
 {
-  if (![self supportsAlternateIcons]) {
+    if (![self supportsAlternateIcons]) {
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"This version of iOS doesn't support alternate icons"] callbackId:command.callbackId];
     return;
-  }
+    }
 
-    BOOL suppressUserNotification = false;
-    NSString *iconName = [command.arguments objectAtIndex:0];;
-    /* if ([[command.arguments objectAtIndex:0] isKindOfClass:[NSString class]]) {
-        NSDictionary *argDict =
-        iconName = argDict[@"iconName"];
-        suppressUserNotification = [argDict[@"supressUserNotification"] boolValue];
-    } else {
-        iconName = [command.arguments objectAtIndex:0];
-    } */
-
-  if (iconName == nil) {
+    BOOL suppressUserNotification = [[command.arguments objectAtIndex:1] boolValue];
+    NSString *iconName = [command.arguments objectAtIndex:0];
+    
+    if (iconName == nil) {
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"The 'iconName' parameter is mandatory"] callbackId:command.callbackId];
     return;
-  }
+    }
+    
+    NSString *iconNameTogether = [@"icon-" stringByAppendingString:iconName];
+    
+    if (suppressUserNotification) {
+        // https://stackoverflow.com/a/49730130/1502477
+        NSMutableString *selectorString = [[NSMutableString alloc] initWithCapacity:40];
+        [selectorString appendString:@"_setAlternate"];
+        [selectorString appendString:@"IconName:"];
+        [selectorString appendString:@"completionHandler:"];
 
-  NSString *iconNameTogether = [@"icon-" stringByAppendingString:iconName];
-  [[UIApplication sharedApplication] setAlternateIconName:iconNameTogether completionHandler:^(NSError *error) {
-      if (error != nil) {
-        NSString *errMsg = error.localizedDescription;
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
-      } else {
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
-      }
-  }];
+        SEL selector = NSSelectorFromString(selectorString);
+        IMP imp = [[UIApplication sharedApplication] methodForSelector:selector];
+        void (*func)(id, SEL, id, id) = (void *)imp;
+        if (func)
+        {
+            func([UIApplication sharedApplication], selector, iconNameTogether, ^(NSError *error) {
+                if (error != nil) {
+                  NSString *errMsg = error.localizedDescription;
+                  [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
+                } else {
+                  [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+                }
+            });
+        }
+    } else {
+        [[UIApplication sharedApplication] setAlternateIconName:iconNameTogether completionHandler:^(NSError *error) {
+            if (error != nil) {
+              NSString *errMsg = error.localizedDescription;
+              [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
+            } else {
+              [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+            }
+        }];
 
-
-  if (suppressUserNotification) {
-    [self suppressUserNotification];
-  }
+    }
 }
 
 - (void) appIconExists:(CDVInvokedUrlCommand*)command
 {
     NSString *iconName = [command.arguments objectAtIndex:0];
+    
+    if (iconName == nil) {
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"The 'iconName' parameter is mandatory"] callbackId:command.callbackId];
+    return;
+    }
+    
     NSString *iconNameTogether = [@"icon-" stringByAppendingString:iconName];
 
     NSDictionary *bundleIcons = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIcons"];
@@ -123,14 +142,6 @@ THE SOFTWARE.
 - (BOOL) supportsAlternateIcons
 {
     return [[UIApplication sharedApplication] supportsAlternateIcons];
-}
-
-- (void) suppressUserNotification
-{
-  UIViewController* suppressAlertVC = [UIViewController new];
-  [self.viewController presentViewController:suppressAlertVC animated:NO completion:^{
-      [suppressAlertVC dismissViewControllerAnimated:NO completion: nil];
-  }];
 }
 
 @end

@@ -24,8 +24,8 @@ THE SOFTWARE.
 
 var exec = require('cordova/exec');
 
-exports.changeAppIcon = function (appIcon, success, error) {
-    exec(success, error, 'SwitchAppIcon', 'changeAppIcon', [appIcon]);
+exports.changeAppIcon = function (appIcon, suppressUserNotification, success, error) {
+    exec(success, error, 'SwitchAppIcon', 'changeAppIcon', [appIcon, suppressUserNotification]);
 };
 
 exports.appIconExists = function (appIcon, success, error) {
