@@ -14,6 +14,8 @@ Please use this variable syntax: `ALIAS_${IDX}_${PROPERTY}`. `${IDX}` has to sta
 * `ENABLED`: Whether this activity should be enabled by default on Android. Default value is `false`.
 
 If you use iOS only, you have to specifiy `NAME` only.
+
+Set `COPY_INTENT_FILTERS` to true to move all intent filters from the main activity on Android to the activity aliases.
 ### Icons
 Please specifiy the icons as a resource file in your `config.xml`. For iOS:
 ```xml

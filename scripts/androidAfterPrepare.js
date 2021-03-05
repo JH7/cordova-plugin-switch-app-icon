@@ -8,20 +8,25 @@ const ANDROID_MANIFEST_PATH = 'platforms/android/app/src/main/AndroidManifest.xm
 const SWITCH_APP_ICON_JAVA_PATH = 'platforms/android/app/src/main/java/de/jh7/switchappicon/SwitchAppIcon.java'
 
 module.exports = async function(context) {
+  const variables = await Utils.getVariables(
+    path.join(context.opts.projectRoot, 'package.json'),
+    path.join(context.opts.projectRoot, 'config.xml')
+  );
+
   const projectAndroidManifest = path.join(context.opts.projectRoot, ANDROID_MANIFEST_PATH);
 
   let androidManifest = fs.readFileSync(projectAndroidManifest, 'utf8');
 
   androidManifest = await xml2js.parseStringPromise(androidManifest);
 
-  let mainActivityAttributes = {};
+  let mainActivityObj = {};
 
   // Removing <category android:name="android.intent.category.LAUNCHER" />
   // from the main activity
   androidManifest.manifest.application[0].activity = androidManifest.manifest.application[0].activity
     .map((activity) => {
       if (activity.$['android:name'] === 'MainActivity') {
-        mainActivityAttributes = { ...activity.$ };
+        mainActivityObj = { ...activity };
         if (activity['intent-filter']
           && activity['intent-filter'][0]
           && activity['intent-filter'][0]['category']) {
@@ -36,21 +41,42 @@ module.exports = async function(context) {
 
             if (activity['intent-filter'][0]['category'].length === 0) {
               delete activity['intent-filter'][0]['category'];
-            } 
+            }
+        }
+
+        if (variables.COPY_INTENT_FILTERS) {
+          // When copying intent filters from the activity to its aliases,
+          // remove the filter from the activity.
+          activity['intent-filter'] = [activity['intent-filter'][0]]
         }
       }
 
       return activity
     });
 
-  const aliases = Utils.getAliasesFromVariables(await Utils.getVariables(
-    path.join(context.opts.projectRoot, 'package.json'),
-    path.join(context.opts.projectRoot, 'config.xml')
-  ));
+  const aliases = Utils.getAliasesFromVariables(variables);
 
   if (aliases.length === 0) {
     console.error('cordova-plugin-switch-app-icon needs at least one alias!');
     process.exit(-1);
+  }
+
+  const mainActivityIntentFilters = [];
+
+  if (variables.COPY_INTENT_FILTERS && mainActivityObj['intent-filter']) {
+    mainActivityObj['intent-filter'].forEach((filter) => {
+      const isMain = filter['action'].some((action) => {
+        if (action.$['android:name'] === 'android.intent.action.MAIN') {
+          return true;
+        }
+
+        return false;
+      });
+
+      if (!isMain) {
+        mainActivityIntentFilters.push(filter);
+      }
+    });
   }
 
   // Add activity aliases
@@ -66,7 +92,7 @@ module.exports = async function(context) {
     })
     .map((entry) => {
       const obj = {};
-      const entryAttributes = { ...mainActivityAttributes };
+      const entryAttributes = { ...mainActivityObj.$ };
       entryAttributes['android:targetActivity'] = '.MainActivity';
       entryAttributes['android:name'] = `.${entry.name}`;
       entryAttributes['android:label'] = entry.label;
@@ -87,7 +113,8 @@ module.exports = async function(context) {
               $: { 'android:name': 'android.intent.category.LAUNCHER' }
             }
           ]
-        }
+        },
+        ...mainActivityIntentFilters,
       ];
 
       return obj;
