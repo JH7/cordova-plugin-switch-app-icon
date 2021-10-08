@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-switch-app-icon",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "Allows the change/switch of the app icon of a cordova app.",
   "cordova": {
     "id": "cordova-plugin-switch-app-icon",
@@ -21,7 +21,7 @@
     "change",
     "switch"
   ],
-  "author": "Jonas Hillebrand",
+  "author": "Jonas M. Hillebrand",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/JH7/cordova-plugin-switch-app-icon/issues"

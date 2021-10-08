@@ -17,15 +17,24 @@ If you use iOS only, you have to specifiy `NAME` only.
 
 Set `COPY_INTENT_FILTERS` to true to move all intent filters from the main activity on Android to the activity aliases.
 ### Icons
-Please specifiy the icons as a resource file in your `config.xml`. For iOS:
+Please specifiy the icons as a resource file in your `config.xml`. For iOS, you need four icon dimensions:
+* 120x120 (`icon-TEST-120x120.png`)
+* 144x144 (`icon-TEST-144x144.png`)
+* 152x152 (`icon-TEST-152x152.png`)
+* 167x167 (`icon-TEST-167x167.png`)
+
+Specify these like so:
 ```xml
 <platform name="ios">
     ...
-    <resource-file src="icon-TEST.png" target="icon-TEST.png" />
+    <resource-file src="icon-TEST-120x120.png" target="icon-TEST-120x120.png" />
+    <resource-file src="icon-TEST-144x144.png" target="icon-TEST-144x144.png" />
+    <resource-file src="icon-TEST-152x152.png" target="icon-TEST-152x152.png" />
+    <resource-file src="icon-TEST-167x167.png" target="icon-TEST-167x167.png" />
     ...
 </platform>
 ```
-For Android:
+For Android, you only need one dimension (144x144), but other dimensions can be easily added by copying them to the corresponding `drawable-Xdpi` directory:
 ```xml
 <platform name="android">
     ...
@@ -54,4 +63,25 @@ Special thanks to https://github.com/EddyVerbruggen/cordova-plugin-app-icon-chan
 Feel free to contribute! Open a PR at any time.
 
 ## License
-MIT
+
+The MIT License (MIT)
+
+Copyright (c) 2021 Jonas M. Hillebrand
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.

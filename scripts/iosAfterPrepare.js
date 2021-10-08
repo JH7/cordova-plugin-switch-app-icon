@@ -27,7 +27,10 @@ module.exports = async function(context) {
       CFBundleAlternateIcons[`icon-${alias.name}`] = {
         UIPrerenderedIcon: true,
         CFBundleIconFiles: [
-          `icon-${alias.name}`,
+          `icon-${alias.name}-144x144`,
+          `icon-${alias.name}-120x120`,
+          `icon-${alias.name}-167x167`,
+          `icon-${alias.name}-152x152`
         ],
       }
     }
