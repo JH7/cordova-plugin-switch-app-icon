@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<plugin id="cordova-plugin-switch-app-icon" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="cordova-plugin-switch-app-icon" version="0.1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
   <name>SwitchAppIcon</name>
   <js-module name="SwitchAppIcon" src="www/SwitchAppIcon.js">
     <merges target="SwitchAppIcon" />
@@ -21,6 +21,14 @@
         <param name="android-package" value="de.jh7.switchappicon.SwitchAppIcon" />
       </feature>
     </config-file>
-    <source-file src="src/android/SwitchAppIcon.java" target-dir="src/de/jh7/switchappicon/" />
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+     <service 
+        android:enabled="true"
+        android:name="de.jh7.switchappicon.SwitchAppIconService"
+        android:label="Icon Switcher Service"
+        android:stopWithTask="false"
+      />
+    </config-file>
+
   </platform>
 </plugin>

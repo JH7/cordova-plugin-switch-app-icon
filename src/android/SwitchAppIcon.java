@@ -26,23 +26,48 @@ package de.jh7.switchappicon;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.CordovaInterface;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.util.Log;
 import org.json.JSONObject;
 
 import android.content.pm.PackageManager;
 import android.content.ComponentName;
+
+import de.apothekendirekt.app.BuildConfig;
 
 public class SwitchAppIcon extends CordovaPlugin {
 
     /**
      * This will be set by the cordova post_prepare hook of this plugin.
      */
-    private enum ICONS { };
+    public enum ICONS { };
+
+    private const String TAG = "SwitchAppIcon";
+
+    private Intent intent;
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "Activity stopped");
+
+        if (intent != null) {
+            cordova.getActivity().stopService(intent);
+        }
+    }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+
         if (action.equals("changeAppIcon")) {
             String appIcon = args.getString(0);
             this.changeAppIcon(appIcon, callbackContext);
@@ -68,34 +93,16 @@ public class SwitchAppIcon extends CordovaPlugin {
     }
 
     private void changeAppIcon(String appIcon, CallbackContext callbackContext) {
-        PackageManager packageManager = cordova.getActivity().getPackageManager();
-        String packageName = cordova.getActivity().getPackageName();
-
-        for (ICONS value : ICONS.values()) {
-            int action = PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-            if (value.toString().equals(appIcon)) {
-                action = PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
-            }
-            packageManager.setComponentEnabledSetting(
-                new ComponentName(packageName, packageName + "." + value.toString()),
-                action,
-                PackageManager.DONT_KILL_APP
-            );
+        if (intent == null) {
+            Log.d(TAG, "Starting service!");
+            intent = new Intent(cordova.getActivity(), de.jh7.switchappicon.SwitchAppIconService.class);
+            cordova.getActivity().startService(intent);
         }
-
-        /* This is a bit hardcore, huh?
-        * Needs <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
-        ActivityManager am = (ActivityManager)cordova.getActivity().getSystemService(Activity.ACTIVITY_SERVICE);
-        Intent i = new Intent(Intent.ACTION_MAIN);
-        i.addCategory(Intent.CATEGORY_HOME);
-        i.addCategory(Intent.CATEGORY_DEFAULT);
-        List<ResolveInfo> resolves = packageManager.queryIntentActivities(i, 0);
-        for (ResolveInfo res : resolves) {
-            if (res.activityInfo != null) {
-                am.killBackgroundProcesses(res.activityInfo.packageName);
-            }
-        }
-        */
+        
+        SharedPreferences sp = cordova.getActivity().getSharedPreferences("SwitchAppIconSettings", Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = sp.edit();
+        edit.putString("currentIcon", appIcon);
+        edit.commit();
 
         callbackContext.success("OK");
     }
