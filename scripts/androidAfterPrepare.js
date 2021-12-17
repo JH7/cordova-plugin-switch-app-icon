@@ -5,7 +5,7 @@ const xml2js = require('xml2js');
 const Utils = require('./lib/utils.js');
 
 const ANDROID_MANIFEST_PATH = 'platforms/android/app/src/main/AndroidManifest.xml';
-const SWITCH_APP_ICON_JAVA_PATH = 'platforms/android/app/src/main/java/de/jh7/switchappicon/SwitchAppIcon.java'
+const SWITCH_APP_ICON_JAVA_PATH = 'platforms/android/app/src/main/java/de/jh7/switchappicon/Icons.java'
 
 module.exports = async function(context) {
   const variables = await Utils.getVariables(
@@ -134,9 +134,12 @@ module.exports = async function(context) {
 
   // Override the enum in SwitchAppIcon.java
   const javaPath = path.join(context.opts.projectRoot, SWITCH_APP_ICON_JAVA_PATH);
-  let javaFile = fs.readFileSync(javaPath, 'utf8');
+  let javaFile = `package de.jh7.switchappicon;
 
-  const reducedAliases = aliases.reduce((acc, alias) => `${acc}, ${alias.name}`, '').substring(2);
-  javaFile = javaFile.replace(/ICONS \{.*\}/, `ICONS { ${reducedAliases} }`);
+public enum Icons {
+  ${aliases.map((alias) => alias.name).join(',')}
+}
+`;
+
   fs.writeFileSync(javaPath, javaFile);
 }

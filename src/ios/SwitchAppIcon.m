@@ -55,6 +55,11 @@ THE SOFTWARE.
 
 @implementation SwitchAppIcon
 
+- (void) preventIconChange:(CDVInvokedUrlCommand*)command
+{
+  [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+}
+
 - (void) isSupported:(CDVInvokedUrlCommand*)command
 {
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:[self supportsAlternateIcons]];

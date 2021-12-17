@@ -21,14 +21,5 @@
         <param name="android-package" value="de.jh7.switchappicon.SwitchAppIcon" />
       </feature>
     </config-file>
-    <config-file target="AndroidManifest.xml" parent="/manifest/application">
-     <service 
-        android:enabled="true"
-        android:name="de.jh7.switchappicon.SwitchAppIconService"
-        android:label="Icon Switcher Service"
-        android:stopWithTask="false"
-      />
-    </config-file>
-
   </platform>
 </plugin>

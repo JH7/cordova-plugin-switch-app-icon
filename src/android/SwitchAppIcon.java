@@ -34,7 +34,6 @@ import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,28 +45,30 @@ import android.content.ComponentName;
 import de.apothekendirekt.app.BuildConfig;
 
 public class SwitchAppIcon extends CordovaPlugin {
+    private final String TAG = "SwitchAppIcon";
 
-    /**
-     * This will be set by the cordova post_prepare hook of this plugin.
-     */
-    public enum ICONS { };
-
-    private const String TAG = "SwitchAppIcon";
-
-    private Intent intent;
+    private boolean shouldPreventIconChange = false;
+    private boolean changedIcon = false;
+    private String changeIcon;
 
     @Override
     public void onStop() {
         Log.d(TAG, "Activity stopped");
 
-        if (intent != null) {
-            cordova.getActivity().stopService(intent);
+        if (changeIcon != null && !shouldPreventIconChange) {
+            enableAppIconAlias(changeIcon);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (changeIcon != null && !changedIcon) {
+            enableAppIconAlias(changeIcon);
         }
     }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-
         if (action.equals("changeAppIcon")) {
             String appIcon = args.getString(0);
             this.changeAppIcon(appIcon, callbackContext);
@@ -78,11 +79,20 @@ public class SwitchAppIcon extends CordovaPlugin {
             this.appIconExists(appIcon, callbackContext);
             return true;
         }
+        if (action.equals("preventIconChange")) {
+            boolean prevent = args.getBoolean(0);
+            this.preventIconChange(prevent);
+            return true;
+        }
         return false;
     }
 
+    private void preventIconChange(boolean prevent) {
+        this.shouldPreventIconChange = prevent;
+    }
+
     private void appIconExists(String appIcon, CallbackContext callbackContext) {
-        for (ICONS value : ICONS.values()) {
+        for (Icons value : Icons.values()) {
             if (value.toString().equals(appIcon)) {
                 callbackContext.success(1);
                 return;
@@ -93,17 +103,42 @@ public class SwitchAppIcon extends CordovaPlugin {
     }
 
     private void changeAppIcon(String appIcon, CallbackContext callbackContext) {
-        if (intent == null) {
-            Log.d(TAG, "Starting service!");
-            intent = new Intent(cordova.getActivity(), de.jh7.switchappicon.SwitchAppIconService.class);
-            cordova.getActivity().startService(intent);
-        }
-        
-        SharedPreferences sp = cordova.getActivity().getSharedPreferences("SwitchAppIconSettings", Context.MODE_PRIVATE);
-        SharedPreferences.Editor edit = sp.edit();
-        edit.putString("currentIcon", appIcon);
-        edit.commit();
+        changedIcon = false;
+        changeIcon = appIcon;
 
         callbackContext.success("OK");
+    }
+
+    public void enableAppIconAlias(String alias) {
+        changedIcon = true;
+        if (alias != "notset" && !isAliasEnabled(alias)) {
+            setAliasEnabled(alias);
+        }
+    }
+
+    boolean isAliasEnabled(String aliasName) {
+        return cordova.getActivity().getPackageManager().getComponentEnabledSetting(
+                new ComponentName(
+                    cordova.getContext(),
+                    BuildConfig.APPLICATION_ID + "." + aliasName
+                )
+        ) == cordova.getActivity().getPackageManager().COMPONENT_ENABLED_STATE_ENABLED;
+    }
+
+    void setAliasEnabled(String aliasName) {
+        for (Icons value : Icons.values()) {
+            int action = PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+            if (value.toString().equals(aliasName)) {
+                action = PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+            }
+
+            ComponentName compName = new ComponentName(cordova.getContext(), BuildConfig.APPLICATION_ID + "." + value.toString());
+
+            cordova.getActivity().getPackageManager().setComponentEnabledSetting(
+                    compName,
+                    action,
+                    PackageManager.DONT_KILL_APP
+            );
+        }
     }
 }

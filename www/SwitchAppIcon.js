@@ -31,3 +31,7 @@ exports.changeAppIcon = function (appIcon, suppressUserNotification, success, er
 exports.appIconExists = function (appIcon, success, error) {
     exec(success, error, 'SwitchAppIcon', 'appIconExists', [appIcon]);
 };
+
+exports.preventIconChange = function (prevent, success, error) {
+    exec(success, error, 'SwitchAppIcon', 'preventIconChange', [prevent]);
+}

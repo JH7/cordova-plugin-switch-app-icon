@@ -57,5 +57,6 @@ THE SOFTWARE.
 - (void) isSupported:(CDVInvokedUrlCommand*)command;
 - (void) changeAppIcon:(CDVInvokedUrlCommand*)command;
 - (void) appIconExists:(CDVInvokedUrlCommand*)command;
+- (void) preventIconChange:(CDVInvokedUrlCommand*)command;
 
 @end
