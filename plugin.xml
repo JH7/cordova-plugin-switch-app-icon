@@ -15,6 +15,7 @@
     <source-file src="src/ios/SwitchAppIcon.h" />
   </platform>
   <platform name="android">
+    <source-file src="src/android/SwitchAppIcon.java" target-dir="src/main/java/de/jh7/switchappicon" />
     <hook type="after_prepare" src="scripts/androidAfterPrepare.js" />
     <config-file parent="/*" target="res/xml/config.xml">
       <feature name="SwitchAppIcon">

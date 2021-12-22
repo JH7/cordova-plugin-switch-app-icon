@@ -141,6 +141,8 @@ public enum Icons {
 }
 `;
 
-  fs.mkdirSync(path.dirname(javaPath), { recursive: true });
+  if (!fs.existsSync(path.dirname(javaPath))) {
+    fs.mkdirSync(path.dirname(javaPath), { recursive: true });
+  }
   fs.writeFileSync(javaPath, javaFile);
 }
