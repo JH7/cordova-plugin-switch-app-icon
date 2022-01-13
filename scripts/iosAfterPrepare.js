@@ -17,10 +17,10 @@ module.exports = async function(context) {
 
   const CFBundleAlternateIcons = {};
 
-  const aliases = Utils.getAliasesFromVariables(await Utils.getVariables(
+  const { aliases } = await Utils.getVariables(
     path.join(context.opts.projectRoot, 'package.json'),
     path.join(context.opts.projectRoot, 'config.xml')
-  ));
+  );
 
   aliases.forEach((alias) => {
     if (!CFBundleAlternateIcons[`icon-${alias.name}`]) {

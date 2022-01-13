@@ -6,14 +6,19 @@ This plugin allows you to switch/change your app icon of your cordova app. On An
 * This plugins re-writes your `AndroidManifest.xml` and `*-Info.plist` so please make sure you have a backup. The re-writing is a bit "hacky" so please make sure that it works with your cordova project.
 
 ## Usage
-### Variables
-Please use this variable syntax: `ALIAS_${IDX}_${PROPERTY}`. `${IDX}` has to start at `0`. `${PROPERTY}` can be one of the following:
-* `ICON`: Specifing the icon for Android. Example: `@mipmap/ic_icon`.
-* `LABEL`: The label for the Android activity.
-* `NAME`: The name for the Android activity. This is the name that must be specified when using this plugin. Please do not use any special characters here including whitespace.
-* `ENABLED`: Whether this activity should be enabled by default on Android. Default value is `false`.
+### Configuration
+```xml
+<cordova-plugin-switch-app-icon>
+  <alias icon="@mipmap/ic_launcher" label="Standard App" name="standard" enabled="true" />
+  <alias icon="@drawable/icon_teest" label="Test App" name="test" />
+</cordova-plugin-switch-app-icon>
+```
+* `icon`: Specifing the icon for Android. Example: `@mipmap/ic_icon`.
+* `label`: The label for the Android activity.
+* `name`: The name for the Android activity. This is the name that must be specified when using this plugin. Please do not use any special characters here including whitespace.
+* `enabled`: Whether this activity should be enabled by default on Android. Default value is `false`.
 
-If you use iOS only, you have to specifiy `NAME` only.
+If you use iOS only, you have to specifiy `name` only.
 
 Set `COPY_INTENT_FILTERS` to true to move all intent filters from the main activity on Android to the activity aliases.
 ### Icons

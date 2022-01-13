@@ -54,7 +54,7 @@ module.exports = async function(context) {
       return activity
     });
 
-  const aliases = Utils.getAliasesFromVariables(variables);
+  const { aliases } = variables;
 
   if (aliases.length === 0) {
     console.error('cordova-plugin-switch-app-icon needs at least one alias!');

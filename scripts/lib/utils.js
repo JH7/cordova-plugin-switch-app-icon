@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { config } = require('process');
 const xml2js = require('xml2js');
 
 /**
@@ -12,7 +13,9 @@ const VARIABLE_MATCHER = /ALIAS_([0-9]+)_.*/;
 
 module.exports = {
   async getVariables(packagePath, configXMLPath) {
-    let variables = {};
+    let variables = {
+      aliases: [],
+    };
 
     if (fs.existsSync(configXMLPath)) {
       let configXML = fs.readFileSync(configXMLPath, 'utf8')
@@ -25,6 +28,18 @@ module.exports = {
               variables[variable.$.name] = variables[variable.$.value];
             });
           }
+        });
+      }
+
+      if (configXML.widget['cordova-plugin-switch-app-icon']) {
+        const aliasConfig = configXML.widget['cordova-plugin-switch-app-icon'][0];
+        aliasConfig?.alias.forEach((alias) => {
+          variables.aliases.push({
+            icon: alias.$.icon,
+            label: alias.$.label,
+            name: alias.$.name,
+            enabled: alias.$.enabled === 'true',
+          });
         });
       }
     }
@@ -45,30 +60,8 @@ module.exports = {
       Object.assign(variables, meteorFetchVariables);
     }
 
+    console.log(variables);
     return variables;
-  },
-  getAliasesFromVariables(variables) {
-    const aliases = [];
-
-    const lastIdx = Object.keys(variables).reduce((acc, variable) => {
-      const res = VARIABLE_MATCHER.exec(variable);
-      if (res && res[1] && parseInt(res[1]) > acc) {
-        return parseInt(res[1]);
-      }
-
-      return acc;
-    }, 0);
-
-    for (let i = 0; i <= lastIdx; i += 1) {
-      aliases.push({
-        icon: variables[`ALIAS_${i}_ICON`],
-        label: variables[`ALIAS_${i}_LABEL`],
-        name: variables[`ALIAS_${i}_NAME`],
-        enabled: variables[`ALIAS_${i}_ENABLED`] === 'true',
-      });
-    }
-
-    return aliases;
   },
   async getAppName(configXMLPath) {
     let configXML = fs.readFileSync(configXMLPath, 'utf8')
