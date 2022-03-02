@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/JH7/cordova-plugin-switch-app-icon#readme",
   "dependencies": {
-    "plist": "^3.0.1",
+    "plist": "^3.0.4",
     "xml2js": "^0.4.23"
   }
 }
